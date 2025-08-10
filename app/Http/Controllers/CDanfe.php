@@ -139,7 +139,22 @@ class CDanfe extends Controller
         }
     }
 
-      public function converterJsonParaXml($json)
+    public function downloadXml($chaveNfe)
+    {
+        $notaFiscal = $this->getNfeDataFromApi($chaveNfe);
+        $xml = $this->converterJsonParaXml($notaFiscal->getData());
+
+        $xmlFileName = "nota_fiscal_" . $chaveNfe . ".xml";
+        Storage::disk("public")->put($xmlFileName, $xml);
+
+        return response()
+            ->download(storage_path("app/public/" . $xmlFileName), $xmlFileName, [
+            "Content-Type" => "application/xml",
+            ])
+            ->deleteFileAfterSend(true);
+    }
+
+    public function converterJsonParaXml($json)
     {
         $data = is_array($json) ? $json : json_decode($json, true);
 

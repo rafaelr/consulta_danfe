@@ -21,11 +21,18 @@
 
         <div class="row justify-content-center mt-4">
             <div class="col-md-6">
-                <form action="{{ route('nfe.download.pdf', '[[value]]') }}" method="GET" class="bg-light p-4 rounded shadow">
+                <form action="" method="GET" class="bg-light p-4 rounded shadow">
                     @csrf
                     <div class="mb-3">
                         <label for="chaveAcesso" class="form-label">Chave de Acesso</label>
                         <input type="text" class="form-control" id="chaveAcesso" name="chaveAcesso" placeholder="Digite a chave de acesso" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipoArquivo" class="form-label">Tipo de Arquivo</label>
+                        <select class="form-select" id="tipoArquivo" name="tipoArquivo" required>
+                            <option value="pdf">PDF</option>
+                            <option value="xml">XML</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Consultar</button>
                 </form>
@@ -41,6 +48,7 @@
         document.querySelector('form').addEventListener('submit', function(event) {
             event.preventDefault();
             const chaveAcesso = document.getElementById('chaveAcesso').value;
+            const tipoArquivo = document.getElementById('tipoArquivo').value;
 
             if (chaveAcesso.trim() === '') {
                 alert('Por favor, insira a chave de acesso.');
@@ -48,9 +56,11 @@
             }
 
             const form = event.target;
-            let actionUrl = "{{ route('nfe.download.pdf','value') }}"; // Replace with your route name
-            form.action = actionUrl.replace('value', chaveAcesso);
-            console.log('Form action URL:',actionUrl); // Debugging line
+            let actionUrlPdf = "{{ route('nfe.download.pdf', 'value') }}";
+            let actionUrlXml = "{{ route('nfe.download.xml', 'value') }}";
+            let actionUrl = tipoArquivo === 'pdf' ? actionUrlPdf : actionUrlXml;
+            actionUrl = actionUrl.replace('value', chaveAcesso);
+            form.action = actionUrl;
             form.submit();
         });
     </script>
