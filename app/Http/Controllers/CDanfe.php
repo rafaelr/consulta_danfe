@@ -12,7 +12,7 @@ use SimpleXMLElement;
 class CDanfe extends Controller
 {
 
-    public function getNfeDataFromApi($chaveNfe)
+    public function getDanfeJson($chaveNfe)
     {
         $credentials = env('SERPRO_CLIENT_ID') . ':' . env('SERPRO_CLIENT_SECRET');
         $encodedCredentials = base64_encode($credentials);
@@ -49,7 +49,6 @@ class CDanfe extends Controller
 
     public function getAccessToken($tokenUrl, $encodedCredentials)
     {
-        // Check if token exists in session and is still valid
         if (session()->has('access_token') && session()->has('token_expiration')) {
             $expiration = session('token_expiration');
             if (Carbon::now()->lessThan($expiration)) {
@@ -89,7 +88,6 @@ class CDanfe extends Controller
         $accessToken = $jsonResponse['access_token'] ?? null;
 
         if ($accessToken) {
-            // Store token and expiration time in session
             $expiration = Carbon::now()->addHours(7);
             session(['access_token' => $accessToken, 'token_expiration' => $expiration]);
         }
@@ -100,17 +98,13 @@ class CDanfe extends Controller
     public function downloadPdf($chaveNfe)
     {
         
-        $notaFiscal = $this->getNfeDataFromApi($chaveNfe);
-        // dd($notaFiscal);
-        
-        $xml = $this->converterJsonParaXml($notaFiscal->getData());
-        
+        $notaFiscal = $this->getDanfeJson($chaveNfe);
+        $xml = $this->jsonToXml($notaFiscal->getData());
         $xmlFileName = "nota_fiscal_.xml";
         $xmlPath = storage_path("app/public/" . $xmlFileName);
         Storage::disk("public")->put($xmlFileName, $xml);
 
         try {
-            // Validate if XML has the expected NFe root element
             $xmlContent = file_get_contents($xmlPath);
             if (
                 strpos($xmlContent, "<NFe") === false &&
@@ -130,7 +124,6 @@ class CDanfe extends Controller
             file_put_contents($pdfPath, $pdf);
             Storage::disk("public")->put($pdfFileName, $pdf);
             unlink($xmlPath);
-            // Validate if PDF was created successfully
             if (!file_exists($pdfPath)) {
                 return back()->with(
                     "error",
@@ -157,8 +150,8 @@ class CDanfe extends Controller
 
     public function downloadXml($chaveNfe)
     {
-        $notaFiscal = $this->getNfeDataFromApi($chaveNfe);
-        $xml = $this->converterJsonParaXml($notaFiscal->getData());
+        $notaFiscal = $this->getDanfeJson($chaveNfe);
+        $xml = $this->jsonToXml($notaFiscal->getData());
 
         $xmlFileName = "nota_fiscal_" . $chaveNfe . ".xml";
         Storage::disk("public")->put($xmlFileName, $xml);
@@ -170,7 +163,7 @@ class CDanfe extends Controller
             ->deleteFileAfterSend(true);
     }
 
-    public function converterJsonParaXml($json)
+    private function jsonToXml($json)
     {
         $data = is_array($json) ? $json : json_decode($json, true);
 
@@ -195,7 +188,7 @@ class CDanfe extends Controller
         return $xml->asXML();
     }
 
-       private function arrayToXml($data, \SimpleXMLElement &$xml)
+    private function arrayToXml($data, \SimpleXMLElement &$xml)
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
