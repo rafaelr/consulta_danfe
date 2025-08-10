@@ -1,4 +1,4 @@
-<p align="center"><a href="#" target="_blank"><img src="https://via.placeholder.com/400x150.png?text=Consulta+Danfe" width="400" alt="Consulta Danfe Logo"></a></p>
+<p align="center"><a href="#" target="_blank"><img src="https://raztec.com.br/wp-content/uploads/2025/05/raztec_b-300x70.png" width="400" alt="Consulta Danfe Logo"></a></p>
 
 <p align="center">
 <a href="#"><img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build Status"></a>
@@ -20,6 +20,10 @@ O projeto **Consulta Danfe** é uma aplicação desenvolvida com o framework **L
 ## Como começar
 
 Para começar a usar o **Consulta Danfe**, siga as instruções detalhadas na [documentação oficial](#). Você encontrará informações sobre instalação, configuração e exemplos de uso.
+
+## Teste o Consulta Danfe
+
+Você pode testar o **Consulta Danfe** acessando o site disponível em [https://danfe.raztec.com.br/](https://danfe.raztec.com.br/).
 
 ## Contribuindo
 
