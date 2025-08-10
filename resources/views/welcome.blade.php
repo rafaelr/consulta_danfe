@@ -21,7 +21,7 @@
 
         <div class="row justify-content-center mt-4">
             <div class="col-md-6">
-                <form action="#" method="POST">
+                <form action="{{ route('nfe.download.pdf', '[[value]]') }}" method="GET" class="bg-light p-4 rounded shadow">
                     @csrf
                     <div class="mb-3">
                         <label for="chaveAcesso" class="form-label">Chave de Acesso</label>
@@ -37,6 +37,23 @@
         <p class="mb-0">© {{ date('Y') }} Consulta DANFE. Todos os direitos reservados.</p>
     </footer>
 
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const chaveAcesso = document.getElementById('chaveAcesso').value;
+
+            if (chaveAcesso.trim() === '') {
+                alert('Por favor, insira a chave de acesso.');
+                return;
+            }
+
+            const form = event.target;
+            let actionUrl = "{{ route('nfe.download.pdf','value') }}"; // Replace with your route name
+            form.action = actionUrl.replace('value', chaveAcesso);
+            console.log('Form action URL:',actionUrl); // Debugging line
+            form.submit();
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
