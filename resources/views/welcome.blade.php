@@ -21,7 +21,7 @@
 
         <div class="row justify-content-center mt-4">
             <div class="col-md-6">
-                <form action="" method="GET" class="bg-light p-4 rounded shadow">
+                <form action="" method="POST" class="bg-light p-4 rounded shadow">
                     @csrf
                     <div class="mb-3">
                         <label for="chaveAcesso" class="form-label">Chave de Acesso</label>
