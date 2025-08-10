@@ -85,7 +85,9 @@ h1 {
         <div class="col-md-6">
             <div class="text-center mb-4">
          
-                <h1 style="font-family: 'Roboto', sans-serif;">Consulta DANFE</h1>
+                <h1 style="font-family: 'Roboto', sans-serif; font-size: 2.5rem; color: #fff;">
+                    Consulta <span style="background: #fff; color: #007bff; font-weight: bold; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 5px;">DANFE</span>
+                </h1>
                 <p class="text-muted">Powered by <strong><a href="https://raztec.com.br" target="_blank" class="text-decoration-none text-white">Raztec</a></strong></p>
             </div>
             <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
