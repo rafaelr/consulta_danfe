@@ -16,13 +16,7 @@ Route::post('/nfe/{chaveNfe}/xml', [CDanfe::class, 'downloadXml'])
     ->name('nfe.download.xml')
     ->where('chaveNfe', '[0-9]{44}'); // Assuming the NFe key is 44 digits long
 
-Route::any('/nfe/{chaveNfe}/{format?}', function (Request $request, $chaveNfe, $format = null) {
-    if ($request->isMethod('get')) {
-        return response()->json(['error' => 'The GET method is not supported for this route'], 405);
-    }
-    if ($format === 'json') {
-        return response()->json(['message' => 'JSON format requested', 'chaveNfe' => $chaveNfe]);
-    }
-    return response()->json(['message' => 'Default JSON response', 'chaveNfe' => $chaveNfe]);
-})->where('chaveNfe', '[0-9]{44}')
-  ->name('nfe.download.default');
+Route::post('/nfe/{chaveNfe}/json', [CDanfe::class, 'getNfeDataFromApi'])
+    ->name('nfe.download.default')
+    ->where('chaveNfe', '[0-9]{44}'); // Assuming the NFe key is 44 digits long
+    

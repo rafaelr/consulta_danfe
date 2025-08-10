@@ -32,6 +32,7 @@
                         <select class="form-select" id="tipoArquivo" name="tipoArquivo" required>
                             <option value="pdf">PDF</option>
                             <option value="xml">XML</option>
+                            <option value="json">JSON</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Consultar</button>
@@ -58,7 +59,9 @@
             const form = event.target;
             let actionUrlPdf = "{{ route('nfe.download.pdf', 'value') }}";
             let actionUrlXml = "{{ route('nfe.download.xml', 'value') }}";
-            let actionUrl = tipoArquivo === 'pdf' ? actionUrlPdf : actionUrlXml;
+            let actionUrlJson = "{{ route('nfe.download.default', 'value') }}";
+
+            let actionUrl = tipoArquivo === 'pdf' ? actionUrlPdf : (tipoArquivo === 'xml' ? actionUrlXml : actionUrlJson);
             actionUrl = actionUrl.replace('value', chaveAcesso);
             form.action = actionUrl;
             form.submit();

@@ -49,6 +49,14 @@ class CDanfe extends Controller
 
     public function getAccessToken($tokenUrl, $encodedCredentials)
     {
+        // Check if token exists in session and is still valid
+        if (session()->has('access_token') && session()->has('token_expiration')) {
+            $expiration = session('token_expiration');
+            if (Carbon::now()->lessThan($expiration)) {
+                return session('access_token');
+            }
+        }
+
         $headers = [
             "Authorization: Basic " . $encodedCredentials,
             "Content-Type: application/x-www-form-urlencoded",
@@ -78,7 +86,15 @@ class CDanfe extends Controller
         }
 
         $jsonResponse = json_decode($response, true);
-        return $jsonResponse['access_token'] ?? null;
+        $accessToken = $jsonResponse['access_token'] ?? null;
+
+        if ($accessToken) {
+            // Store token and expiration time in session
+            $expiration = Carbon::now()->addHours(7);
+            session(['access_token' => $accessToken, 'token_expiration' => $expiration]);
+        }
+
+        return $accessToken;
     }
 
     public function downloadPdf($chaveNfe)
