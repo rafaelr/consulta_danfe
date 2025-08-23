@@ -12,7 +12,8 @@ use SimpleXMLElement;
 class CDanfe extends Controller
 {
 
-    public function getDanfeJson($chaveNfe)
+
+      public function getDanfe($chaveNfe)
     {
         $credentials = env('SERPRO_CLIENT_ID') . ':' . env('SERPRO_CLIENT_SECRET');
         $encodedCredentials = base64_encode($credentials);
@@ -44,7 +45,21 @@ class CDanfe extends Controller
             throw new \Exception("Erro na consulta: HTTP " . $httpCode . ", Detalhes: " . $response);
         }
 
-        return response()->json($response);
+        return $response;
+
+    }
+
+    public function getDanfeJson($chaveNfe)
+    {
+        $notaFiscalJson = $this->getDanfe($chaveNfe);
+        $notaFiscal = json_decode($notaFiscalJson, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception("Erro ao decodificar JSON: " . json_last_error_msg());
+        }
+
+        return response()->json($notaFiscal);
+
     }
 
     public function getAccessToken($tokenUrl, $encodedCredentials)
@@ -98,8 +113,9 @@ class CDanfe extends Controller
     public function downloadPdf($chaveNfe)
     {
         
-        $notaFiscal = $this->getDanfeJson($chaveNfe);
-        $xml = $this->jsonToXml($notaFiscal->getData());
+        $notaFiscal = $this->getDanfe($chaveNfe);
+    
+        $xml = $this->jsonToXml($notaFiscal);
         $xmlFileName = "nota_fiscal_.xml";
         $xmlPath = storage_path("app/public/" . $xmlFileName);
         Storage::disk("public")->put($xmlFileName, $xml);
@@ -150,8 +166,9 @@ class CDanfe extends Controller
 
     public function downloadXml($chaveNfe)
     {
-        $notaFiscal = $this->getDanfeJson($chaveNfe);
-        $xml = $this->jsonToXml($notaFiscal->getData());
+        $notaFiscal = $this->getDanfe($chaveNfe);
+
+        $xml = $this->jsonToXml($notaFiscal);
 
         $xmlFileName = "nota_fiscal_" . $chaveNfe . ".xml";
         Storage::disk("public")->put($xmlFileName, $xml);
@@ -180,10 +197,13 @@ class CDanfe extends Controller
         $this->arrayToXml($data, $xml);
         $xml->addAttribute("versao", "4.00");
         $xml->addAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe");
-        $xml->nfeProc->NFe->infNFe->addAttribute(
-            "Id",
-            "NFe" . $data["nfeProc"]["NFe"]["infNFe"]["Id"]
-        );
+
+        if (isset($data["nfeProc"]["NFe"]["infNFe"]["Id"])) {
+            $xml->nfeProc->NFe->infNFe->addAttribute(
+                "Id",
+                "NFe" . $data["nfeProc"]["NFe"]["infNFe"]["Id"]
+            );
+        }
 
         return $xml->asXML();
     }
@@ -192,17 +212,28 @@ class CDanfe extends Controller
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
-                // é numerado? então repete a mesma tag
+                // Handle numeric keys
                 if (is_numeric($key)) {
-                    $this->arrayToXml($value, $xml);
-                } else {
-                    $subnode = $xml->addChild($key);
-                    $this->arrayToXml($value, $subnode);
+                    $key = 'item'; // Generic name for numeric array items
                 }
+                $subnode = $xml->addChild($key);
+                $this->arrayToXml($value, $subnode);
             } else {
-                $xml->addChild($key, htmlspecialchars((string) $value));
+                // Ensure the key is valid and not empty
+                if (!empty($key) && !is_numeric($key)) {
+                    $xml->addChild($key, htmlspecialchars((string) $value));
+                }
+            }
+        }
+
+        // Special handling for "det" key to iterate through its items
+        if (isset($data['det']) && is_array($data['det'])) {
+            foreach ($data['det'] as $detItem) {
+                $detNode = $xml->addChild('det');
+                $this->arrayToXml($detItem, $detNode);
             }
         }
     }
+
     
 }

@@ -16,7 +16,7 @@ Route::post('/nfe/{chaveNfe}/xml', [CDanfe::class, 'downloadXml'])
     ->name('nfe.download.xml')
     ->where('chaveNfe', '[0-9]{44}'); // Assuming the NFe key is 44 digits long
 
-Route::post('/nfe/{chaveNfe}/json', [CDanfe::class, 'getNfeDataFromApi'])
+Route::post('/nfe/{chaveNfe}/json', [CDanfe::class, 'getDanfeJson'])
     ->name('nfe.download.default')
     ->where('chaveNfe', '[0-9]{44}'); // Assuming the NFe key is 44 digits long
     
