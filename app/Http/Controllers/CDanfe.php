@@ -211,22 +211,22 @@ class CDanfe extends Controller
     private function arrayToXml($data, \SimpleXMLElement &$xml)
     {
         foreach ($data as $key => $value) {
+            if ($key === 'det') {
+                continue;
+            }
+
             if (is_array($value)) {
-                // Handle numeric keys
                 if (is_numeric($key)) {
-                    $key = 'item'; // Generic name for numeric array items
+                    $key = 'item';
                 }
                 $subnode = $xml->addChild($key);
                 $this->arrayToXml($value, $subnode);
             } else {
-                // Ensure the key is valid and not empty
                 if (!empty($key) && !is_numeric($key)) {
                     $xml->addChild($key, htmlspecialchars((string) $value));
                 }
             }
         }
-
-        // Special handling for "det" key to iterate through its items
         if (isset($data['det']) && is_array($data['det'])) {
             foreach ($data['det'] as $detItem) {
                 $detNode = $xml->addChild('det');
